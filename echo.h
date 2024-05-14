@@ -3,6 +3,7 @@
 #ifndef __ECHO_H__
 #define __ECHO_H__
 
-void echo_init(void);
+/* Returns 0 on success, -1 on failure. */
+int echo_init(void);
 
 #endif

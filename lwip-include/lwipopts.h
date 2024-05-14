@@ -17,11 +17,12 @@
 #define LWIP_ICMP                       1
 #define IP_FRAG                         1
 
-#define LWIP_DEBUG                      0
+#define ICMP_DEBUG                      LWIP_DBG_ON
+#define LWIP_DEBUG                      LWIP_DBG_ON
 #define ECHO_DEBUG                      LWIP_DBG_ON
-//#define IP4_DEBUG                       LWIP_DBG_ON
-//#define NETIF_DEBUG                     LWIP_DBG_ON
-//#define TCP_DEBUG                       LWIP_DBG_ON
+#define IP4_DEBUG                       LWIP_DBG_ON
+#define NETIF_DEBUG                     LWIP_DBG_ON
+#define TCP_DEBUG                       LWIP_DBG_ON
 //#define ETHARP_DEBUG                    LWIP_DBG_ON
 
 #define PPP_SUPPORT                     0

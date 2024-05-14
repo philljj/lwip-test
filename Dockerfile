@@ -4,8 +4,8 @@ RUN apt update && apt install -y unzip libpcap-dev build-essential git cmake && 
 
 WORKDIR /src
 
-#RUN git clone https://git.savannah.nongnu.org/git/lwip.git
-RUN git clone https://github.com/lwip-tcpip/lwip
+#RUN git clone https://github.com/lwip-tcpip/lwip
+RUN git clone https://github.com/philljj/lwip.git
 
 COPY . lwip-echo
 
@@ -22,3 +22,4 @@ WORKDIR /app
 COPY --from=builder /build/lwip-runner .
 
 CMD /app/lwip-runner
+#ENTRYPOINT ["/bin/bash", "-c", "/app/lwip-runner"]

@@ -10,6 +10,10 @@ set(CMAKE_CXX_FLAGS "-O0 -ggdb")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O0 -ggdb")
 
+# These might not be necessary.
+#set(LWIP_DEFINITIONS LWIP_DEBUG=1)
+#set(LWIP_DEFINITIONS SOCKETS_DEBUG=1)
+
 find_path( PCAP_INCLUDE_DIR NAMES pcap/pcap.h pcap.h HINTS "${PCAP_HINTS}/include")
 
 find_library( PCAP_LIBRARY NAMES pcap wpcap HINTS "${PCAP_HINTS}/lib")

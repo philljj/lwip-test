@@ -28,17 +28,18 @@ int dbg_printf(const char *fmt, ...)
 
 static err_t pcap_output(struct netif *netif, struct pbuf *p)
 {
-    pcap_t *pcap = netif->state;
-    //printf("Sending packet with length %d\n", p->tot_len);
+    pcap_t * pcap = netif->state;
+    int      rc =  0;
 
-    int r = pcap_sendpacket(pcap, (uint8_t *)p->payload, p->tot_len);
+    rc = pcap_sendpacket(pcap, (uint8_t *)p->payload, p->tot_len);
 
-    if (r != 0)
-    {
-        printf("Error sending packet\n");
-        printf("Error: %s\n", pcap_geterr(pcap));
+    if (rc != 0) {
+        printf("error: pcap_sendpacket returned: %d: %s\n", rc,
+               pcap_geterr(pcap));
         return ERR_IF;
     }
+
+    printf("info: pcap_sendpacket sent %d bytes\n", p->tot_len);
 
     return ERR_OK;
 }
@@ -60,10 +61,16 @@ static err_t init_callback(struct netif *netif)
 
 int main(size_t argc, char **argv)
 {
-    pcap_t *pcap = pcap_open_live("eth0", 65536, 1, 100, NULL);
-    char errbuf[PCAP_ERRBUF_SIZE];
+    printf("info: argc: %d\n", argc);
+    printf("info: argv[argc - 1]: %s\n", argv[argc - 1]);
 
+    pcap_t *     pcap = NULL;
     struct netif netif;
+    char         errbuf[PCAP_ERRBUF_SIZE];
+    int          rc = 0;
+
+    pcap = pcap_open_live("eth0", 65536, 1, 100, NULL);
+
     memset(&netif, 0, sizeof netif);
     netif.hwaddr_len = 6;
     memcpy(netif.hwaddr, "\xaa\x00\x00\x00\x00\x01", 6);
@@ -79,7 +86,12 @@ int main(size_t argc, char **argv)
 
     NETIF_SET_CHECKSUM_CTRL(&netif, 0x00FF);
 
-    echo_init();
+    rc = echo_init();
+
+    if (rc < 0) {
+        printf("error: echo_init returned %d\n", rc);
+        return EXIT_FAILURE;
+    }
 
     sys_restart_timeouts();
 
@@ -115,6 +127,6 @@ int main(size_t argc, char **argv)
         netif.input(pbuf, &netif);
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
