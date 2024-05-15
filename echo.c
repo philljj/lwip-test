@@ -317,11 +317,6 @@ echo_tcp_client_init(void)
         return -1;
     }
 
-    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: listen-pcb: %x\n", pcb));
-
-    /* Set accept message callback */
-    tcp_accept(pcb, echo_tcp_accept);
-
     return 0;
 }
 
