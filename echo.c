@@ -17,7 +17,7 @@
 /* globals */
 
 /* Toggle tcp/udp at build time. */
-static int use_tcp = 0;
+static int use_tcp = 1;
 
 /* tcp functions */
 
