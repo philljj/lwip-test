@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+/* gnu c and posix includes */
 #include <stdio.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
-
+/* pcap includes */
 #include <pcap/pcap.h>
-
-#include <lwip/init.h>
-#include <lwip/netif.h>
-#include <lwip/ethip6.h>
-#include <netif/etharp.h>
-#include <lwip/udp.h>
-#include <lwip/mld6.h>
-#include <lwip/timeouts.h>
-
+/* lwip includes */
+#include "lwip/init.h"
+#include "lwip/netif.h"
+#include "lwip/ethip6.h"
+#include "netif/etharp.h"
+#include "lwip/udp.h"
+#include "lwip/mld6.h"
+#include "lwip/timeouts.h"
+/* this example's includes */
 #include "echo.h"
 
 int
@@ -95,7 +96,10 @@ main(size_t argc,
     memcpy(netif.hwaddr, "\xaa\x00\x00\x00\x00\x01", 6);
 
     /* This is the hard-coded listen IP iaddress */
-    ip4_addr_t ip, mask, gw;
+    ip_addr_t ip;
+    ip_addr_t mask;
+    ip_addr_t gw;
+
     IP4_ADDR(&ip, 172, 17, 0, 5);
     IP4_ADDR(&mask, 255, 255, 0, 0);
     IP4_ADDR(&gw, 172, 17, 0, 1);
@@ -120,11 +124,10 @@ main(size_t argc,
 
     sys_restart_timeouts();
 
-    struct pcap_pkthdr *hdr = NULL;
-    const unsigned char *data = NULL;
+    struct pcap_pkthdr *  hdr = NULL;
+    const unsigned char * data = NULL;
 
-    while (1)
-    {
+    for (;;) {
         sys_check_timeouts();
         int r = pcap_next_ex(pcap, &hdr, &data);
 
