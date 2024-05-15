@@ -26,10 +26,17 @@ int dbg_printf(const char *fmt, ...)
     return r;
 }
 
-static err_t pcap_output(struct netif *netif, struct pbuf *p)
+static err_t
+pcap_output(struct netif * netif,
+            struct pbuf *  p)
 {
     pcap_t * pcap = netif->state;
     int      rc =  0;
+
+    if (pcap == NULL) {
+        printf("error: pcap_output: netif->state == NULL\n");
+        return ERR_IF;
+    }
 
     rc = pcap_sendpacket(pcap, (uint8_t *)p->payload, p->tot_len);
 
@@ -64,12 +71,20 @@ int main(size_t argc, char **argv)
     printf("info: argc: %d\n", argc);
     printf("info: argv[argc - 1]: %s\n", argv[argc - 1]);
 
-    pcap_t *     pcap = NULL;
-    struct netif netif;
-    char         errbuf[PCAP_ERRBUF_SIZE];
-    int          rc = 0;
+    pcap_t *       pcap = NULL;
+    struct netif   netif;
+    struct netif * netif_p;
+    char           errbuf[PCAP_ERRBUF_SIZE];
+    int            rc = 0;
 
-    pcap = pcap_open_live("eth0", 65536, 1, 100, NULL);
+    memset(errbuf, 0, sizeof(errbuf));
+
+    pcap = pcap_open_live("eth0", 65536, 1, 100, errbuf);
+
+    if (pcap == NULL) {
+        printf("error: pcap_open_live returned: %s\n", errbuf);
+        return EXIT_FAILURE;
+    }
 
     memset(&netif, 0, sizeof netif);
     netif.hwaddr_len = 6;
@@ -81,7 +96,13 @@ int main(size_t argc, char **argv)
     IP4_ADDR(&mask, 255, 255, 0, 0);
     IP4_ADDR(&gw, 172, 17, 0, 1);
 
-    netif_add(&netif, &ip, &mask, &gw, pcap, init_callback, ethernet_input);
+    netif_p = netif_add(&netif, &ip, &mask, &gw, pcap, init_callback, ethernet_input);
+
+    if (netif_p == NULL) {
+        printf("error: netif_add returned: NULL\n");
+        return EXIT_FAILURE;
+    }
+
     netif_set_up(&netif);
 
     NETIF_SET_CHECKSUM_CTRL(&netif, 0x00FF);
