@@ -22,7 +22,7 @@
 
 
 /* Toggle tcp/udp at build time. */
-static int use_tcp = 1;
+static int use_tcp = 0;
 /* Toggle server/client mode. */
 static int am_server = 0;
 
@@ -189,9 +189,8 @@ echo_tcp_connect(void *           arg,
 
     /* Made new connection */
     LWIP_PLATFORM_DIAG(("info: echo_tcp_connect called\n"));
-    printf("info: connected to: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)),
-           pcb->remote_port);
-
+    printf("info: tcp connected to: %s port: %d\n",
+           ipaddr_ntoa(&(pcb->remote_ip)), pcb->remote_port);
 
     /* Set TCP receive packet callback. */
     tcp_recv(pcb, echo_tcp_recv);
@@ -283,22 +282,22 @@ echo_udp_server_init(void)
 static int
 echo_tcp_client_init(void)
 {
-    struct tcp_pcb * pcb = NULL;
+    struct tcp_pcb * tpcb = NULL;
     ip_addr_t        dst_ip;
     err_t            err = 0;
 
-    pcb = tcp_new();
+    tpcb = tcp_new();
 
-    if (pcb == NULL) {
+    if (tpcb == NULL) {
         printf("error: tcp_new returned: NULL\n");
         return -1;
     }
 
-    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: tpcb: %x\n", tpcb));
 
     #if defined(ECHO_BIND_CLIENT)
     /* Optionally bind the client side to port 11111. */
-    err = tcp_bind(pcb, IP_ADDR_ANY, 11111);
+    err = tcp_bind(tpcb, IP_ADDR_ANY, 11111);
 
     if (err != ERR_OK) {
         printf("error: tcp_bind returned: %d\n", err);
@@ -310,7 +309,7 @@ echo_tcp_client_init(void)
 
     IP4_ADDR(&dst_ip, 172, 17, 0, 1);
 
-    err = tcp_connect(pcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT, echo_tcp_connect);
+    err = tcp_connect(tpcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT, echo_tcp_connect);
 
     if (err != ERR_OK) {
         printf("error: tcp_connect returned: %d\n", err);
@@ -323,29 +322,77 @@ echo_tcp_client_init(void)
 static int
 echo_udp_client_init(void)
 {
-    struct udp_pcb * pcb = NULL;
+    struct udp_pcb * upcb = NULL;
+    ip_addr_t        dst_ip;
     err_t            err = 0;
+    struct pbuf *    p = NULL;
+    struct pbuf *    q = NULL;
+    const char *     hello_msg = "Hi from lwip UDP client (-:";
+    const char *     src = NULL;
+    u16_t            data_len;
 
-    pcb = udp_new();
+    upcb = udp_new();
 
-    if (pcb == NULL) {
+    if (upcb == NULL) {
         printf("error: udp_new returned: NULL\n");
         return -1;
     }
 
-    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: upcb: %x\n", upcb));
 
+    #if defined(ECHO_BIND_CLIENT)
+    /* Optionally bind the client side to port 11111. */
     /* Bind port 11111 */
-    err = udp_bind(pcb, IP_ADDR_ANY, 11111);
+    err = udp_bind(upcb, IP_ADDR_ANY, 11111);
 
     if (err != ERR_OK) {
         printf("error: udp_bind returned: %d\n", err);
         return -1;
     }
+    #endif
 
-    udp_recv(pcb, echo_udp_recv, NULL);
+    udp_recv(upcb, echo_udp_recv, NULL);
 
-    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: udp_bind: %d\n", err));
+    IP4_ADDR(&dst_ip, 172, 17, 0, 1);
+
+    err = udp_connect(upcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT);
+
+    if (err != ERR_OK) {
+        printf("error: udp_connect returned: %d\n", err);
+        return -1;
+    }
+    printf("info: udp connected to: %s port: %d\n",
+           ipaddr_ntoa(&(upcb->remote_ip)), upcb->remote_port);
+
+    /* Prepare a buffer with our udp hello. */
+    data_len = strlen(hello_msg);
+    p = pbuf_alloc(PBUF_RAW, (u16_t)data_len, PBUF_POOL);
+
+    if (p == NULL) {
+        printf("error: pbuf_alloc returned: NULL\n");
+        return -1;
+    }
+
+    src = hello_msg;
+
+    for (q = p; q != NULL; q = q->next) {
+        if (data_len <= 0) {
+            break;
+        }
+
+        printf("q->len: %d\n", q->len);
+        memcpy(q->payload, src, q->len);
+        data_len -= q->len;
+        src += q->len;
+    }
+
+    //err = udp_sendto(upcb, p, &dst_ip, NCAT_DEFAULT_LISTEN_PORT);
+    err = udp_send(upcb, p);
+
+    if (err != ERR_OK) {
+        printf("error: udp_sendto returned: %d\n");
+        return -1;
+    }
 
     return 0;
 }
