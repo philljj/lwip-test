@@ -6,11 +6,11 @@ WORKDIR /src
 
 #RUN git clone https://github.com/lwip-tcpip/lwip
 
-# Use clone of master.
-RUN git clone https://github.com/philljj/lwip.git
+# Use master.
+#RUN git clone https://github.com/philljj/lwip.git
 
 # Use old 2_0_3
-#RUN git clone https://github.com/philljj/lwip.git && cd lwip && git checkout stable-2_0_3_patched && cd ../
+RUN git clone https://github.com/philljj/lwip.git && cd lwip && git checkout stable-2_0_3_patched && cd ../
 
 COPY . lwip-echo
 

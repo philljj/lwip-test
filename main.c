@@ -17,7 +17,8 @@
 
 #include "echo.h"
 
-int dbg_printf(const char *fmt, ...)
+int
+dbg_printf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -51,7 +52,8 @@ pcap_output(struct netif * netif,
     return ERR_OK;
 }
 
-static err_t init_callback(struct netif *netif)
+static err_t
+init_callback(struct netif * netif)
 {
     netif->name[0] = 't';
     netif->name[1] = 'p';
@@ -66,7 +68,9 @@ static err_t init_callback(struct netif *netif)
     return ERR_OK;
 }
 
-int main(size_t argc, char **argv)
+int
+main(size_t argc,
+     char * argv[])
 {
     printf("info: argc: %d\n", argc);
     printf("info: argv[argc - 1]: %s\n", argv[argc - 1]);
@@ -150,4 +154,3 @@ int main(size_t argc, char **argv)
 
     return EXIT_SUCCESS;
 }
-
