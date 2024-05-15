@@ -14,10 +14,17 @@
 /* this example's includes */
 #include "echo.h"
 
+/* defines */
+
+#define NCAT_DEFAULT_LISTEN_PORT 31337
+
 /* globals */
+
 
 /* Toggle tcp/udp at build time. */
 static int use_tcp = 1;
+/* Toggle server/client mode. */
+static int am_server = 0;
 
 /* tcp functions */
 
@@ -110,9 +117,10 @@ echo_tcp_accept(void *           arg,
                 err_t            err)
 {
     /* Accepted new connection */
-    LWIP_PLATFORM_DIAG(("echo_tcp_accept called\n"));
+    LWIP_PLATFORM_DIAG(("info: echo_tcp_accept called\n"));
 
-    printf("Connect from: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)), pcb->remote_port);
+    printf("info: connect from: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)),
+           pcb->remote_port);
 
     /* Set an arbitrary pointer for callbacks. */
     //tcp_arg(pcb, esm);
@@ -172,10 +180,38 @@ echo_udp_recv(void *            arg,
     return;
 }
 
+static err_t
+echo_tcp_connect(void *           arg,
+                 struct tcp_pcb * pcb,
+                 err_t            err)
+{
+    (void) arg;
+
+    /* Made new connection */
+    LWIP_PLATFORM_DIAG(("info: echo_tcp_connect called\n"));
+    printf("info: connected to: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)),
+           pcb->remote_port);
+
+
+    /* Set TCP receive packet callback. */
+    tcp_recv(pcb, echo_tcp_recv);
+
+    /* Set a TCP packet sent callback. */
+    tcp_sent(pcb, echo_tcp_sent);
+
+    /* Set an error callback. */
+    tcp_err(pcb, echo_tcp_err);
+
+    /* Set a TCP poll callback */
+    tcp_poll(pcb, echo_tcp_poll, 1);
+
+    return ERR_OK;
+}
+
 /* init functions */
 
 static int
-echo_tcp_init(void)
+echo_tcp_server_init(void)
 {
     struct tcp_pcb * pcb = NULL;
     err_t            err = 0;
@@ -215,7 +251,82 @@ echo_tcp_init(void)
 }
 
 static int
-echo_udp_init(void)
+echo_udp_server_init(void)
+{
+    struct udp_pcb * pcb = NULL;
+    err_t            err = 0;
+
+    pcb = udp_new();
+
+    if (pcb == NULL) {
+        printf("error: udp_new returned: NULL\n");
+        return -1;
+    }
+
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
+
+    /* Bind port 11111 */
+    err = udp_bind(pcb, IP_ADDR_ANY, 11111);
+
+    if (err != ERR_OK) {
+        printf("error: udp_bind returned: %d\n", err);
+        return -1;
+    }
+
+    udp_recv(pcb, echo_udp_recv, NULL);
+
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: udp_bind: %d\n", err));
+
+    return 0;
+}
+
+static int
+echo_tcp_client_init(void)
+{
+    struct tcp_pcb * pcb = NULL;
+    ip_addr_t        dst_ip;
+    err_t            err = 0;
+
+    pcb = tcp_new();
+
+    if (pcb == NULL) {
+        printf("error: tcp_new returned: NULL\n");
+        return -1;
+    }
+
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
+
+    #if defined(ECHO_BIND_CLIENT)
+    /* Optionally bind the client side to port 11111. */
+    err = tcp_bind(pcb, IP_ADDR_ANY, 11111);
+
+    if (err != ERR_OK) {
+        printf("error: tcp_bind returned: %d\n", err);
+        return -1;
+    }
+
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: tcp_bind: %d\n", err));
+    #endif
+
+    IP4_ADDR(&dst_ip, 172, 17, 0, 1);
+
+    err = tcp_connect(pcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT, echo_tcp_connect);
+
+    if (err != ERR_OK) {
+        printf("error: tcp_connect returned: %d\n", err);
+        return -1;
+    }
+
+    LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: listen-pcb: %x\n", pcb));
+
+    /* Set accept message callback */
+    tcp_accept(pcb, echo_tcp_accept);
+
+    return 0;
+}
+
+static int
+echo_udp_client_init(void)
 {
     struct udp_pcb * pcb = NULL;
     err_t            err = 0;
@@ -247,10 +358,20 @@ echo_udp_init(void)
 int
 echo_init(void)
 {
-    if (use_tcp) {
-        return echo_tcp_init();
+    if (am_server) {
+        if (use_tcp) {
+            return echo_tcp_server_init();
+        }
+        else {
+            return echo_udp_server_init();
+        }
     }
     else {
-        return echo_udp_init();
+        if (use_tcp) {
+            return echo_tcp_client_init();
+        }
+        else {
+            return echo_udp_client_init();
+        }
     }
 }
