@@ -22,7 +22,7 @@
 
 
 /* Toggle tcp/udp at build time. */
-static int use_tcp = 0;
+static int use_tcp = 1;
 /* Toggle server/client mode. */
 static int am_server = 0;
 
@@ -285,6 +285,11 @@ echo_tcp_client_init(void)
     struct tcp_pcb * tpcb = NULL;
     ip_addr_t        dst_ip;
     err_t            err = 0;
+    struct pbuf *    p = NULL;
+    struct pbuf *    q = NULL;
+    const char *     hello_msg = "Hi from lwip TCP client (-:";
+    const char *     src = NULL;
+    u16_t            data_len;
 
     tpcb = tcp_new();
 
@@ -314,6 +319,49 @@ echo_tcp_client_init(void)
     if (err != ERR_OK) {
         printf("error: tcp_connect returned: %d\n", err);
         return -1;
+    }
+
+    /* Prepare a buffer with our tcp hello. */
+    data_len = strlen(hello_msg);
+    p = pbuf_alloc(PBUF_RAW, (u16_t)data_len, PBUF_POOL);
+
+    if (p == NULL) {
+        printf("error: pbuf_alloc returned: NULL\n");
+        return -1;
+    }
+
+    src = hello_msg;
+
+    for (q = p; q != NULL; q = q->next) {
+        if (data_len <= 0) {
+            break;
+        }
+
+        printf("q->len: %d\n", q->len);
+        memcpy(q->payload, src, q->len);
+        data_len -= q->len;
+        src += q->len;
+
+
+        /* Enqueue the data to be sent. */
+        err = tcp_write(tpcb, q->payload, q->len, 1);
+
+        if (err != ERR_OK) {
+            printf("error: tcp_write(%d) returned: %d\n", q->len, err);
+            return -1;
+        }
+
+        /* Now trigger it to be sent. */
+        err = tcp_output(tpcb);
+
+        if (err != ERR_OK) {
+            printf("error: tcp_output(%p) returned: %d\n", (void *)tpcb,
+                   err);
+        }
+        else {
+            printf("info: tcp_output(%p) returned: %d\n", (void *)tpcb,
+                   err);
+        }
     }
 
     return 0;
