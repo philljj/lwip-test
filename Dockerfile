@@ -14,6 +14,10 @@ RUN git clone https://github.com/philljj/lwip.git && cd lwip && git checkout sta
 
 COPY . lwip-echo
 
+RUN find * -name "lwip.patch"
+
+RUN cd lwip && git apply ../lwip-echo/lwip.patch && cd ../
+
 WORKDIR /build
 
 RUN cmake /src/lwip-echo/ && make -j
