@@ -281,7 +281,7 @@ echo_tcp_client_init(void)
     err_t            err = 0;
     struct pbuf *    p = NULL;
     struct pbuf *    q = NULL;
-    const char *     hello_msg = "Hi from lwip TCP client (-:";
+    const char *     hello_msg = "Hi from lwip TCP client (-:\n";
     const char *     src = NULL;
     u16_t            data_len;
 
@@ -370,7 +370,7 @@ echo_udp_client_init(void)
     err_t            err = 0;
     struct pbuf *    p = NULL;
     struct pbuf *    q = NULL;
-    const char *     hello_msg = "Hi from lwip UDP client (-:";
+    const char *     hello_msg = "Hi from lwip UDP client (-:\n";
     const char *     src = NULL;
     u16_t            data_len;
 
