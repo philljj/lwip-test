@@ -92,7 +92,9 @@ echo_tcp_sent(void *           arg,
               struct tcp_pcb * pcb,
               u16_t            len)
 {
-    printf("Sent: %d\n", len);
+    (void) arg;
+    (void) pcb;
+    printf("sent: %d\n", len);
     return ERR_OK;
 }
 
@@ -100,14 +102,17 @@ static void
 echo_tcp_err(void * arg,
              err_t  err)
 {
-    LWIP_DEBUGF(ECHO_DEBUG, ("echo_tcp_err: %s (%i)\n", lwip_strerr(err), err));
-    printf("Err: %s\n", lwip_strerr(err));
+    (void) arg;
+    printf("error: echo_tcp_err: %s\n", lwip_strerr(err));
+    return;
 }
 
 static err_t
 echo_tcp_poll(void *           arg,
               struct tcp_pcb * pcb)
 {
+    (void) arg;
+    (void) pcb;
     return ERR_OK;
 }
 
@@ -116,25 +121,19 @@ echo_tcp_accept(void *           arg,
                 struct tcp_pcb * pcb,
                 err_t            err)
 {
+    (void) arg;
+    (void) arg;
+
     /* Accepted new connection */
     LWIP_PLATFORM_DIAG(("info: echo_tcp_accept called\n"));
 
     printf("info: connect from: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)),
            pcb->remote_port);
 
-    /* Set an arbitrary pointer for callbacks. */
-    //tcp_arg(pcb, esm);
-
-    /* Set TCP receive packet callback. */
+    /* Set TCP callbacks. */
     tcp_recv(pcb, echo_tcp_recv);
-
-    /* Set a TCP packet sent callback. */
     tcp_sent(pcb, echo_tcp_sent);
-
-    /* Set an error callback. */
     tcp_err(pcb, echo_tcp_err);
-
-    /* Set a TCP poll callback */
     tcp_poll(pcb, echo_tcp_poll, 1);
 
     return ERR_OK;
@@ -186,22 +185,16 @@ echo_tcp_connect(void *           arg,
                  err_t            err)
 {
     (void) arg;
+    (void) err;
 
     /* Made new connection */
-    LWIP_PLATFORM_DIAG(("info: echo_tcp_connect called\n"));
     printf("info: tcp connected to: %s port: %d\n",
            ipaddr_ntoa(&(pcb->remote_ip)), pcb->remote_port);
 
-    /* Set TCP receive packet callback. */
+    /* Set TCP callbacks. */
     tcp_recv(pcb, echo_tcp_recv);
-
-    /* Set a TCP packet sent callback. */
     tcp_sent(pcb, echo_tcp_sent);
-
-    /* Set an error callback. */
     tcp_err(pcb, echo_tcp_err);
-
-    /* Set a TCP poll callback */
     tcp_poll(pcb, echo_tcp_poll, 1);
 
     return ERR_OK;
@@ -243,6 +236,7 @@ echo_tcp_server_init(void)
     }
 
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: listen-pcb: %x\n", pcb));
+
     /* Set accept message callback */
     tcp_accept(pcb, echo_tcp_accept);
 
@@ -314,7 +308,8 @@ echo_tcp_client_init(void)
 
     IP4_ADDR(&dst_ip, 172, 17, 0, 1);
 
-    err = tcp_connect(tpcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT, echo_tcp_connect);
+    err = tcp_connect(tpcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT,
+                      echo_tcp_connect);
 
     if (err != ERR_OK) {
         printf("error: tcp_connect returned: %d\n", err);
@@ -434,7 +429,6 @@ echo_udp_client_init(void)
         src += q->len;
     }
 
-    //err = udp_sendto(upcb, p, &dst_ip, NCAT_DEFAULT_LISTEN_PORT);
     err = udp_send(upcb, p);
 
     if (err != ERR_OK) {

@@ -150,7 +150,7 @@ main(size_t argc,
         }
 
         //printf("Packet length: %d / %d\n", hdr->len, hdr->caplen);
-        struct pbuf *pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
+        struct pbuf * pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
         memcpy(pbuf->payload, data, hdr->len);
         netif.input(pbuf, &netif);
     }
