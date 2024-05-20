@@ -1,22 +1,11 @@
 FROM debian:10 AS builder
 
-RUN apt update && apt install -y unzip libpcap-dev build-essential git cmake && rm -rf /var/lib/dpkg/lists/*
+RUN apt update && apt install -y unzip libpcap-dev build-essential git cmake \
+  && rm -rf /var/lib/dpkg/lists/*
 
 WORKDIR /src
 
-#RUN git clone https://github.com/lwip-tcpip/lwip
-
-# Use master.
-#RUN git clone https://github.com/philljj/lwip.git
-
-# Use old 2_0_3
-RUN git clone https://github.com/philljj/lwip.git && cd lwip && git checkout stable-2_0_3_patched && cd ../
-
 COPY . lwip-echo
-
-RUN find * -name "lwip.patch"
-
-RUN cd lwip && git apply ../lwip-echo/lwip.patch && cd ../
 
 WORKDIR /build
 

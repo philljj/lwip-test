@@ -20,6 +20,14 @@ Docker daemon is running:
 sudo dockerd
 ```
 
+Clone or copy lwip src dir tree to this directory:
+
+```sh
+ls
+CMakeLists.txt  Dockerfile  echo.c  echo.h  LICENSE  lwip  lwip-include  lwip.patch  main.c  README.md
+```
+
+
 ## Usage
 
 Build the docker image:

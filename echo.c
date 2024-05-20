@@ -22,7 +22,7 @@
 
 
 /* Toggle tcp/udp at build time. */
-static int use_tcp = 1;
+static int use_tcp = 0;
 /* Toggle server/client mode. */
 static int am_server = 0;
 

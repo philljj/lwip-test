@@ -3,6 +3,8 @@
 
 *.patch
 
+# Ignore the lwip and build dirs.
+/lwip
 /build
 
 # Vim swp files
