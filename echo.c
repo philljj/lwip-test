@@ -15,12 +15,9 @@
 #include "echo.h"
 
 /* defines */
-
 #define NCAT_DEFAULT_LISTEN_PORT 31337
 
 /* globals */
-
-
 /* Toggle tcp/udp at build time. */
 static int use_tcp = 0;
 /* Toggle server/client mode. */
@@ -29,18 +26,18 @@ static int am_server = 0;
 /* tcp functions */
 
 static void
-echo_tcp_close(struct tcp_pcb *pcb)
+echo_tcp_close(struct tcp_pcb *tpcb)
 {
-    tcp_arg(pcb, NULL);
-    tcp_sent(pcb, NULL);
-    tcp_recv(pcb, NULL);
-    tcp_arg(pcb, NULL);
-    tcp_close(pcb);
+    tcp_arg(tpcb, NULL);
+    tcp_sent(tpcb, NULL);
+    tcp_recv(tpcb, NULL);
+    tcp_arg(tpcb, NULL);
+    tcp_close(tpcb);
 }
 
 static err_t
 echo_tcp_recv(void *           arg,
-              struct tcp_pcb * pcb,
+              struct tcp_pcb * tpcb,
               struct pbuf *    p,
               err_t            err)
 {
@@ -55,7 +52,7 @@ echo_tcp_recv(void *           arg,
 
             /* Echo it back to sender.
              * First enqueue the data to be sent. */
-            wr_err = tcp_write(pcb, q->payload, q->len, 1);
+            wr_err = tcp_write(tpcb, q->payload, q->len, 1);
 
             if (wr_err != ERR_OK) {
                 printf("error: tcp_write(%d) returned: %d\n", q->len, wr_err);
@@ -65,20 +62,20 @@ echo_tcp_recv(void *           arg,
             printf("send: %.*s\n", q->len, q->payload);
 
             /* Now trigger it to be sent. */
-            wr_err = tcp_output(pcb);
+            wr_err = tcp_output(tpcb);
 
             if (wr_err != ERR_OK) {
-                printf("error: tcp_output(%p) returned: %d\n", (void *)pcb,
+                printf("error: tcp_output(%p) returned: %d\n", (void *)tpcb,
                        wr_err);
             }
             else {
-                printf("info: tcp_output(%p) returned: %d\n", (void *)pcb,
+                printf("info: tcp_output(%p) returned: %d\n", (void *)tpcb,
                        wr_err);
             }
         }
     }
     else if (err == ERR_OK && p == NULL) {
-        echo_tcp_close(pcb);
+        echo_tcp_close(tpcb);
     }
     else {
         printf("error: echo_tcp_recv: %d\n", err);
@@ -89,11 +86,11 @@ echo_tcp_recv(void *           arg,
 
 static err_t
 echo_tcp_sent(void *           arg,
-              struct tcp_pcb * pcb,
+              struct tcp_pcb * tpcb,
               u16_t            len)
 {
     (void) arg;
-    (void) pcb;
+    (void) tpcb;
     printf("sent: %d\n", len);
     return ERR_OK;
 }
@@ -109,16 +106,16 @@ echo_tcp_err(void * arg,
 
 static err_t
 echo_tcp_poll(void *           arg,
-              struct tcp_pcb * pcb)
+              struct tcp_pcb * tpcb)
 {
     (void) arg;
-    (void) pcb;
+    (void) tpcb;
     return ERR_OK;
 }
 
 static err_t
 echo_tcp_accept(void *           arg,
-                struct tcp_pcb * pcb,
+                struct tcp_pcb * tpcb,
                 err_t            err)
 {
     (void) arg;
@@ -127,14 +124,14 @@ echo_tcp_accept(void *           arg,
     /* Accepted new connection */
     LWIP_PLATFORM_DIAG(("info: echo_tcp_accept called\n"));
 
-    printf("info: connect from: %s port: %d\n", ipaddr_ntoa(&(pcb->remote_ip)),
-           pcb->remote_port);
+    printf("info: connect from: %s port: %d\n", ipaddr_ntoa(&(tpcb->remote_ip)),
+           tpcb->remote_port);
 
     /* Set TCP callbacks. */
-    tcp_recv(pcb, echo_tcp_recv);
-    tcp_sent(pcb, echo_tcp_sent);
-    tcp_err(pcb, echo_tcp_err);
-    tcp_poll(pcb, echo_tcp_poll, 1);
+    tcp_recv(tpcb, echo_tcp_recv);
+    tcp_sent(tpcb, echo_tcp_sent);
+    tcp_err(tpcb, echo_tcp_err);
+    tcp_poll(tpcb, echo_tcp_poll, 1);
 
     return ERR_OK;
 }
@@ -181,7 +178,7 @@ echo_udp_recv(void *            arg,
 
 static err_t
 echo_tcp_connect(void *           arg,
-                 struct tcp_pcb * pcb,
+                 struct tcp_pcb * tpcb,
                  err_t            err)
 {
     (void) arg;
@@ -189,13 +186,13 @@ echo_tcp_connect(void *           arg,
 
     /* Made new connection */
     printf("info: tcp connected to: %s port: %d\n",
-           ipaddr_ntoa(&(pcb->remote_ip)), pcb->remote_port);
+           ipaddr_ntoa(&(tpcb->remote_ip)), tpcb->remote_port);
 
     /* Set TCP callbacks. */
-    tcp_recv(pcb, echo_tcp_recv);
-    tcp_sent(pcb, echo_tcp_sent);
-    tcp_err(pcb, echo_tcp_err);
-    tcp_poll(pcb, echo_tcp_poll, 1);
+    tcp_recv(tpcb, echo_tcp_recv);
+    tcp_sent(tpcb, echo_tcp_sent);
+    tcp_err(tpcb, echo_tcp_err);
+    tcp_poll(tpcb, echo_tcp_poll, 1);
 
     return ERR_OK;
 }
