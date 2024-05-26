@@ -3,9 +3,10 @@
 
 *.patch
 
-# Ignore the lwip and build dirs.
+# Ignore the lwip, build, and wolfssl dirs.
 /lwip
 /build
+/wolfssl
 
 # Vim swp files
 *.swp
