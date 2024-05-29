@@ -10,8 +10,9 @@ WORKDIR /src
 COPY . lwip-echo
 
 RUN cd /src/lwip-echo/wolfssl && ./autogen.sh && \
-  ./configure --disable-shared --enable-static --enable-cryptonly --disable-examples && \
-  make
+  ./configure --disable-shared --enable-static --enable-cryptonly \
+  --disable-examples && \
+  make && make install
 
 WORKDIR /build
 

@@ -20,9 +20,12 @@ find_library( PCAP_LIBRARY NAMES pcap wpcap HINTS "${PCAP_HINTS}/lib")
 
 find_path(LWIP_DIR src/include/lwip/init.h ${CMAKE_CURRENT_SOURCE_DIR}/lwip)
 
+find_path(WOLFSSL_DIR wolfssl/version.h ${CMAKE_CURRENT_SOURCE_DIR}/wolfssl)
+
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/lwip-include
 	${PCAP_INCLUDE_DIR}
+	${WOLFSSL_DIR}/wolfssl
 	${LWIP_DIR}/src/include
     ${LWIP_DIR}/contrib/ports/unix/port
 	${CMAKE_CURRENT_SOURCE_DIR}/../..
@@ -35,4 +38,4 @@ add_executable(lwip-runner
     ${LWIP_DIR}/contrib/ports/unix/port/sys_arch.c
 	${CMAKE_CURRENT_SOURCE_DIR}/echo.c
 )
-target_link_libraries(lwip-runner ${PCAP_LIBRARY} lwipcore)
+target_link_libraries(lwip-runner ${PCAP_LIBRARY} lwipcore wolfssl)
