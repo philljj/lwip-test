@@ -315,7 +315,7 @@ echo_tcp_client_init(void)
 
     /* Prepare a buffer with our tcp hello. */
     data_len = strlen(hello_msg);
-    p = pbuf_alloc(PBUF_RAW, (u16_t)data_len, PBUF_POOL);
+    p = pbuf_alloc(PBUF_IP, (u16_t)data_len, PBUF_RAM);
 
     if (p == NULL) {
         printf("error: pbuf_alloc returned: NULL\n");
@@ -406,7 +406,7 @@ echo_udp_client_init(void)
 
     /* Prepare a buffer with our udp hello. */
     data_len = strlen(hello_msg);
-    p = pbuf_alloc(PBUF_RAW, (u16_t)data_len, PBUF_POOL);
+    p = pbuf_alloc(PBUF_IP, (u16_t)data_len, PBUF_RAM);
 
     if (p == NULL) {
         printf("error: pbuf_alloc returned: NULL\n");
@@ -429,7 +429,7 @@ echo_udp_client_init(void)
     err = udp_send(upcb, p);
 
     if (err != ERR_OK) {
-        printf("error: udp_sendto returned: %d\n");
+        printf("error: udp_send returned: %d\n");
         return -1;
     }
 
