@@ -18,6 +18,9 @@
 /* this example's includes */
 #include "echo.h"
 
+/* defines */
+#define NCAT_DEFAULT_LISTEN_PORT 31337
+
 int
 dbg_printf(const char *fmt, ...)
 {
@@ -59,7 +62,12 @@ init_callback(struct netif * netif)
     netif->name[0] = 't';
     netif->name[1] = 'p';
     netif->linkoutput = pcap_output;
+#if LWIP_IPV4
     netif->output = etharp_output;
+#endif
+#if LWIP_IPV6
+  netif->output_ip6 = ethip6_output;
+#endif
 
     netif->mtu = 1500;
     netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
@@ -99,12 +107,21 @@ main(size_t argc,
     ip_addr_t ip;
     ip_addr_t mask;
     ip_addr_t gw;
-
+    #if LWIP_IPV6
+    IP6_ADDR(&ip, 172, 17, 0, 5);
+    IP6_ADDR(&mask, 255, 255, 0, 0);
+    IP6_ADDR(&gw, 172, 17, 0, 1);
+    #else
     IP4_ADDR(&ip, 172, 17, 0, 5);
     IP4_ADDR(&mask, 255, 255, 0, 0);
     IP4_ADDR(&gw, 172, 17, 0, 1);
+    #endif
 
+    #if LWIP_IPV6
+    netif_p = netif_add(&netif, pcap, init_callback, ethernet_input);
+    #else
     netif_p = netif_add(&netif, &ip, &mask, &gw, pcap, init_callback, ethernet_input);
+    #endif
 
     if (netif_p == NULL) {
         printf("error: netif_add returned: NULL\n");

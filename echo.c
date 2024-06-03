@@ -303,7 +303,11 @@ echo_tcp_client_init(void)
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: tcp_bind: %d\n", err));
     #endif
 
+    #if LWIP_IPV6
+    IP6_ADDR(&dst_ip, 172, 17, 0, 1);
+    #else
     IP4_ADDR(&dst_ip, 172, 17, 0, 1);
+    #endif
 
     err = tcp_connect(tpcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT,
                       echo_tcp_connect);
@@ -393,7 +397,11 @@ echo_udp_client_init(void)
 
     udp_recv(upcb, echo_udp_recv, NULL);
 
+    #if LWIP_IPV6
+    IP6_ADDR(&dst_ip, 172, 17, 0, 1);
+    #else
     IP4_ADDR(&dst_ip, 172, 17, 0, 1);
+    #endif
 
     err = udp_connect(upcb, &dst_ip, NCAT_DEFAULT_LISTEN_PORT);
 
