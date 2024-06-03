@@ -11,6 +11,8 @@
 #define LWIP_ALLOW_MEM_FREE_FROM_OTHER_CONTEXT 1
 
 #define LWIP_ETHERNET                   1
+// Enable LWIP_IPV4 or LWIP_IPV6, but
+// not both.
 #define LWIP_IPV4                       0
 #define LWIP_IPV6                       1
 #define LWIP_TCP                        1
