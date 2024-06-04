@@ -19,7 +19,7 @@
 
 /* globals */
 /* Toggle tcp/udp at build time. */
-static int use_tcp = 0;
+static int use_tcp = 1;
 /* Toggle server/client mode. */
 static int am_server = 0;
 
@@ -281,6 +281,7 @@ echo_tcp_client_init(void)
     const char *     hello_msg = "Hi from lwip TCP client (-:\n";
     const char *     src = NULL;
     u16_t            data_len;
+    int              addr_ok = 0;
 
     tpcb = tcp_new();
 
@@ -304,7 +305,11 @@ echo_tcp_client_init(void)
     #endif
 
     #if LWIP_IPV6
-    IP6_ADDR(&dst_ip, 172, 17, 0, 1);
+    addr_ok = ip6addr_aton("2001:db8::1", ip_2_ip6(&dst_ip));
+    if (addr_ok != 1) {
+        printf("error: ip6addr_aton failed\n");
+        return -1;
+    }
     #else
     IP4_ADDR(&dst_ip, 172, 17, 0, 1);
     #endif

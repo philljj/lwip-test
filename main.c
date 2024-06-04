@@ -66,7 +66,7 @@ init_callback(struct netif * netif)
     netif->output = etharp_output;
 #endif
 #if LWIP_IPV6
-  netif->output_ip6 = ethip6_output;
+    netif->output_ip6 = ethip6_output;
 #endif
 
     netif->mtu = 1500;
@@ -104,14 +104,19 @@ main(size_t argc,
     memcpy(netif.hwaddr, "\xaa\x00\x00\x00\x00\x01", 6);
 
     /* This is the hard-coded listen IP iaddress */
+    #if LWIP_IPV6
+    ip6_addr_t ip;
+    int        addr_ok = 0;
+
+    addr_ok = ip6addr_aton("2001:db8::5", &ip);
+    if (addr_ok != 1) {
+        printf("error: ip6addr_aton failed\n");
+        return -1;
+    }
+    #else
     ip_addr_t ip;
     ip_addr_t mask;
     ip_addr_t gw;
-    #if LWIP_IPV6
-    IP6_ADDR(&ip, 172, 17, 0, 5);
-    IP6_ADDR(&mask, 255, 255, 0, 0);
-    IP6_ADDR(&gw, 172, 17, 0, 1);
-    #else
     IP4_ADDR(&ip, 172, 17, 0, 5);
     IP4_ADDR(&mask, 255, 255, 0, 0);
     IP4_ADDR(&gw, 172, 17, 0, 1);
@@ -119,6 +124,9 @@ main(size_t argc,
 
     #if LWIP_IPV6
     netif_p = netif_add(&netif, pcap, init_callback, ethernet_input);
+    netif_ip6_addr_set(&netif, 0, &ip);
+    netif_ip6_addr_set_state(&netif, 0, IP6_ADDR_TENTATIVE);
+    netif_ip6_addr_set_state(&netif, 0, IP6_ADDR_PREFERRED);
     #else
     netif_p = netif_add(&netif, &ip, &mask, &gw, pcap, init_callback, ethernet_input);
     #endif

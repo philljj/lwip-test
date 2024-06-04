@@ -24,7 +24,8 @@
 #define LWIP_DEBUG                      LWIP_DBG_ON
 #define ECHO_DEBUG                      LWIP_DBG_ON
 #define IP4_DEBUG                       LWIP_DBG_ON
-#define NETIF_DEBUG                     LWIP_DBG_ON
+//#define IP6_DEBUG                       LWIP_DBG_ON
+//#define NETIF_DEBUG                     LWIP_DBG_ON
 //#define INET_DEBUG                      LWIP_DBG_ON
 //#define TCP_DEBUG                       LWIP_DBG_ON
 //#define UDP_DEBUG                       LWIP_DBG_ON
