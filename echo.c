@@ -91,7 +91,6 @@ echo_tcp_sent(void *           arg,
 {
     (void) arg;
     (void) tpcb;
-    printf("sent: %d\n", len);
     return ERR_OK;
 }
 
