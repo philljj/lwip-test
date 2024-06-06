@@ -70,7 +70,8 @@ init_callback(struct netif * netif)
 #endif
 
     netif->mtu = 1500;
-    netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP | NETIF_FLAG_ETHERNET;
+    netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP |
+                   NETIF_FLAG_ETHERNET;
 
     netif_set_link_up(netif);
 
@@ -81,9 +82,6 @@ int
 main(size_t argc,
      char * argv[])
 {
-    printf("info: argc: %d\n", argc);
-    printf("info: argv[argc - 1]: %s\n", argv[argc - 1]);
-
     pcap_t *       pcap = NULL;
     struct netif   netif;
     struct netif * netif_p;
@@ -128,7 +126,8 @@ main(size_t argc,
     netif_ip6_addr_set_state(&netif, 0, IP6_ADDR_TENTATIVE);
     netif_ip6_addr_set_state(&netif, 0, IP6_ADDR_PREFERRED);
     #else
-    netif_p = netif_add(&netif, &ip, &mask, &gw, pcap, init_callback, ethernet_input);
+    netif_p = netif_add(&netif, &ip, &mask, &gw, pcap, init_callback,
+                        ethernet_input);
     #endif
 
     if (netif_p == NULL) {
@@ -159,7 +158,7 @@ main(size_t argc,
         switch (r)
         {
             case 0:
-                // Timeout
+                // timeout
                 continue;
 
             case -1:
@@ -174,7 +173,6 @@ main(size_t argc,
                 continue;
         }
 
-        //printf("Packet length: %d / %d\n", hdr->len, hdr->caplen);
         struct pbuf * pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
         memcpy(pbuf->payload, data, hdr->len);
         netif.input(pbuf, &netif);

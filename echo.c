@@ -124,8 +124,8 @@ echo_tcp_accept(void *           arg,
     /* Accepted new connection */
     LWIP_PLATFORM_DIAG(("info: echo_tcp_accept called\n"));
 
-    printf("info: connect from: %s port: %d\n", ipaddr_ntoa(&(tpcb->remote_ip)),
-           tpcb->remote_port);
+    printf("info: connect from: %s port: %d\n",
+           ipaddr_ntoa(&(tpcb->remote_ip)), tpcb->remote_port);
 
     /* Set TCP callbacks. */
     tcp_recv(tpcb, echo_tcp_recv);
