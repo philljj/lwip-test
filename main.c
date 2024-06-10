@@ -97,6 +97,8 @@ main(size_t argc,
         return EXIT_FAILURE;
     }
 
+    lwip_init();
+
     memset(&netif, 0, sizeof netif);
     netif.hwaddr_len = 6;
     memcpy(netif.hwaddr, "\xaa\x00\x00\x00\x00\x01", 6);

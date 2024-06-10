@@ -18,7 +18,8 @@
 #define LWIP_TCP                        1
 #define LWIP_ARP                        1
 #define LWIP_ICMP                       1
-#define IP_FRAG                         1
+#define IP_FRAG                         0
+#define LWIP_IPV6_REASS                 0
 
 #define ICMP_DEBUG                      LWIP_DBG_ON
 #define LWIP_DEBUG                      LWIP_DBG_ON
