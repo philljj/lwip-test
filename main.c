@@ -51,7 +51,9 @@ pcap_output(struct netif * netif,
         return ERR_IF;
     }
 
+    #if ECHO_TEST_INFO_MSG
     printf("info: pcap_sendpacket sent %d bytes\n", p->tot_len);
+    #endif
 
     return ERR_OK;
 }

@@ -21,7 +21,7 @@
 /* Toggle tcp/udp at build time. */
 static int use_tcp = 0;
 /* Toggle server/client mode. */
-static int am_server = 0;
+static int am_server = 1;
 
 /* tcp functions */
 
@@ -47,7 +47,7 @@ echo_tcp_recv(void *           arg,
         struct pbuf * q = NULL;
 
         for (q = p; q != NULL; q = q->next) {
-            printf("recv: %.*s\n", q->len, q->payload);
+            printf("recv: %.*s", q->len, q->payload);
             err_t wr_err = ERR_OK;
 
             /* Echo it back to sender.
@@ -59,7 +59,7 @@ echo_tcp_recv(void *           arg,
                 continue;
             }
 
-            printf("send: %.*s\n", q->len, q->payload);
+            printf("send: %.*s", q->len, q->payload);
 
             /* Now trigger it to be sent. */
             wr_err = tcp_output(tpcb);
@@ -69,8 +69,10 @@ echo_tcp_recv(void *           arg,
                        wr_err);
             }
             else {
+               #if ECHO_TEST_INFO_MSG
                 printf("info: tcp_output(%p) returned: %d\n", (void *)tpcb,
                        wr_err);
+               #endif
             }
         }
     }
@@ -157,8 +159,8 @@ echo_udp_recv(void *            arg,
 
         for (q = p; q != NULL; q = q->next) {
             err_t wr_err = ERR_OK;
-            printf("recv: %.*s\n", q->len, q->payload);
-            printf("send: %.*s\n", q->len, q->payload);
+            printf("recv: %.*s", q->len, q->payload);
+            printf("send: %.*s", q->len, q->payload);
             /* Echo received packet back to sender. */
             wr_err = udp_sendto(upcb, q, addr, port);
 
@@ -359,8 +361,10 @@ echo_tcp_client_init(void)
                    err);
         }
         else {
+            #if ECHO_TEST_INFO_MSG
             printf("info: tcp_output(%p) returned: %d\n", (void *)tpcb,
                    err);
+            #endif
         }
     }
 

@@ -20,7 +20,10 @@ RUN cmake /src/lwip-echo/ && make -j
 
 FROM debian:10 AS runner
 
-RUN apt-get update && apt-get install -y libpcap0.8 && \
+# Add this to RUN command for debugging.
+#    apt-get install -y valgrind && \
+RUN apt-get update && \
+    apt-get install -y libpcap0.8 && \
     apt-get install -y ncat && \
     rm -rf /var/lib/dpkg/lists/*
 
@@ -29,4 +32,5 @@ WORKDIR /app
 COPY --from=builder /build/lwip-runner .
 
 CMD /app/lwip-runner
-#ENTRYPOINT ["/bin/bash", "-c", "/app/lwip-runner"]
+#CMD valgrind -v --tool=memcheck --track-origins=yes --leak-check=full \
+# --show-leak-kinds=all /app/lwip-runner
