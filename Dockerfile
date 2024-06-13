@@ -32,5 +32,5 @@ WORKDIR /app
 COPY --from=builder /build/lwip-runner .
 
 CMD /app/lwip-runner
-#CMD valgrind -v --tool=memcheck --track-origins=yes --leak-check=full \
+#CMD valgrind --tool=memcheck --track-origins=yes --leak-check=full \
 # --show-leak-kinds=all /app/lwip-runner

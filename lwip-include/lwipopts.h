@@ -16,6 +16,7 @@
 #define LWIP_IPV4                       0
 #define LWIP_IPV6                       1
 #define LWIP_TCP                        1
+#define LWIP_UDP                        1
 #define LWIP_ARP                        1
 #define LWIP_ICMP                       1
 #define IP_FRAG                         0
