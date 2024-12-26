@@ -11,7 +11,7 @@ COPY . lwip-echo
 
 RUN cd /src/lwip-echo/wolfssl && ./autogen.sh && \
   ./configure --disable-shared --enable-static --enable-cryptonly \
-  --enable-des3 --disable-examples && \
+  --enable-des3 --enable-aesgcm-stream --disable-examples && \
   make && make install
 
 WORKDIR /build
