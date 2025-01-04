@@ -168,6 +168,10 @@ echo_udp_recv(void *            arg,
                 printf("error: udp_sendto returned: %d\n", wr_err);
                 continue;
             }
+
+            /* don't need to iterate because the underlying
+             * code will process the whole chain. */
+            break;
         }
     }
     else {

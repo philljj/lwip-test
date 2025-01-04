@@ -177,9 +177,51 @@ main(size_t argc,
                 continue;
         }
 
+    #if 0
+        /* Process all in one contiguous pbuf. */
         struct pbuf * pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
         memcpy(pbuf->payload, data, hdr->len);
         netif.input(pbuf, &netif);
+    #else
+        /* Process in pbuf chain to test chaining. */
+        size_t chain_len = 120;
+        size_t hdr_len = 0;
+        size_t pbuf_len = 0;
+        size_t offset = 0;
+        struct pbuf * pbuf_head = NULL;
+        struct pbuf * pbuf_tail = NULL;
+
+        hdr_len = hdr->len;
+        pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
+        pbuf_head = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
+
+        printf("chain_len: %d\n", chain_len);
+        printf("pbuf_len: %d\n", pbuf_len);
+        printf("hdr_len: %d\n", hdr_len);
+        printf("offset: %d\n", offset);
+
+        memcpy(pbuf_head->payload, data, pbuf_len);
+        hdr_len -= pbuf_len;
+        offset += pbuf_len;
+
+        while (hdr_len) {
+            pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
+            pbuf_tail = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
+
+            printf("chain_len: %d\n", chain_len);
+            printf("pbuf_len: %d\n", pbuf_len);
+            printf("hdr_len: %d\n", hdr_len);
+            printf("offset: %d\n", offset);
+
+            memcpy(pbuf_tail->payload, data + offset, pbuf_len);
+            hdr_len -= pbuf_len;
+            offset += pbuf_len;
+
+            pbuf_chain(pbuf_head, pbuf_tail);
+        }
+
+        netif.input(pbuf_head, &netif);
+    #endif
     }
 
     return EXIT_SUCCESS;
