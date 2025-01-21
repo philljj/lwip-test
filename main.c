@@ -77,6 +77,8 @@ init_callback(struct netif * netif)
 
     netif_set_link_up(netif);
 
+    netif_ipsec_enable(netif);
+
     return ERR_OK;
 }
 
