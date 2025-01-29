@@ -5,8 +5,10 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
+
 /* pcap includes */
 #include <pcap/pcap.h>
+
 /* lwip includes */
 #include "lwip/init.h"
 #include "lwip/netif.h"
@@ -15,6 +17,9 @@
 #include "lwip/udp.h"
 #include "lwip/mld6.h"
 #include "lwip/timeouts.h"
+#include "lwip/esp_common.h"
+#include "lwip/ip6_esp.h"
+
 /* this example's includes */
 #include "echo.h"
 
@@ -154,6 +159,12 @@ main(size_t argc,
 
     sys_restart_timeouts();
 
+    #define IPSEC_PROVISION
+
+    #ifdef IPSEC_PROVISION
+    #include "ipsec_provision.c"
+    #endif
+
     struct pcap_pkthdr *  hdr = NULL;
     const unsigned char * data = NULL;
 
@@ -179,7 +190,7 @@ main(size_t argc,
                 continue;
         }
 
-    #if 0
+    #if 1
         /* Process all in one contiguous pbuf. */
         struct pbuf * pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
         memcpy(pbuf->payload, data, hdr->len);
