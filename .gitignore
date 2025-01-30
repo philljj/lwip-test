@@ -3,6 +3,9 @@
 
 *.patch
 
+# Ignore the script generated file.
+ipsec_provision.c
+
 # Ignore the lwip, build, and wolfssl dirs.
 /lwip
 /build
