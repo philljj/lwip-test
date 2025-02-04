@@ -159,9 +159,8 @@ main(size_t argc,
 
     sys_restart_timeouts();
 
-    #define IPSEC_PROVISION
-
-    #ifdef IPSEC_PROVISION
+    #if 1
+    /* whether to include provisioning code. */
     #include "ipsec_provision.c"
     #endif
 
