@@ -16,6 +16,9 @@
 
 /* defines */
 #define NCAT_DEFAULT_LISTEN_PORT 31337
+/* if doing UDP encap of ESP */
+#define LWIP_DEFAULT_LISTEN_PORT 11111
+#define LWIP_LISTEN_PORT         LWIP_DEFAULT_LISTEN_PORT
 
 /* globals */
 /* Toggle tcp/udp at build time. */
@@ -220,7 +223,7 @@ echo_tcp_server_init(void)
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
 
     /* Bind port 11111 */
-    err = tcp_bind(pcb, IP_ADDR_ANY, 11111);
+    err = tcp_bind(pcb, IP_ADDR_ANY, LWIP_LISTEN_PORT);
 
     if (err != ERR_OK) {
         printf("error: tcp_bind returned: %d\n", err);
@@ -260,8 +263,8 @@ echo_udp_server_init(void)
 
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: pcb: %x\n", pcb));
 
-    /* Bind port 11111 */
-    err = udp_bind(pcb, IP_ADDR_ANY, 11111);
+    /* Bind port LWIP_LISTEN_PORT */
+    err = udp_bind(pcb, IP_ADDR_ANY, LWIP_LISTEN_PORT);
 
     if (err != ERR_OK) {
         printf("error: udp_bind returned: %d\n", err);
@@ -298,8 +301,8 @@ echo_tcp_client_init(void)
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: tpcb: %x\n", tpcb));
 
     #if defined(ECHO_BIND_CLIENT)
-    /* Optionally bind the client side to port 11111. */
-    err = tcp_bind(tpcb, IP_ADDR_ANY, 11111);
+    /* Optionally bind the client side to port LWIP_LISTEN_PORT. */
+    err = tcp_bind(tpcb, IP_ADDR_ANY, LWIP_LISTEN_PORT);
 
     if (err != ERR_OK) {
         printf("error: tcp_bind returned: %d\n", err);
@@ -398,9 +401,9 @@ echo_udp_client_init(void)
     LWIP_DEBUGF(ECHO_DEBUG, ("echo_init: upcb: %x\n", upcb));
 
     #if defined(ECHO_BIND_CLIENT)
-    /* Optionally bind the client side to port 11111. */
-    /* Bind port 11111 */
-    err = udp_bind(upcb, IP_ADDR_ANY, 11111);
+    /* Optionally bind the client side to port LWIP_LISTEN_PORT. */
+    /* Bind port LWIP_LISTEN_PORT */
+    err = udp_bind(upcb, IP_ADDR_ANY, LWIP_LISTEN_PORT);
 
     if (err != ERR_OK) {
         printf("error: udp_bind returned: %d\n", err);

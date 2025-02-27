@@ -84,6 +84,11 @@ init_callback(struct netif * netif)
 
     netif_ipsec_enable(netif);
 
+    /* whether to enable espinudp encap. */
+    #if 1
+    netif_espinudp_enable(netif);
+    #endif
+
     return ERR_OK;
 }
 
@@ -159,8 +164,8 @@ main(size_t argc,
 
     sys_restart_timeouts();
 
-    #if 1
-    /* whether to include provisioning code. */
+    #if 0
+    /* whether to include (script generated) provisioning code. */
     #include "ipsec_provision.c"
     #endif
 
