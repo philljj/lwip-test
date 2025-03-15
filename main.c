@@ -1,14 +1,10 @@
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 /* gnu c and posix includes */
 #include <stdio.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <string.h>
-
 /* pcap includes */
 #include <pcap/pcap.h>
-
 /* lwip includes */
 #include "lwip/init.h"
 #include "lwip/netif.h"
@@ -17,9 +13,10 @@
 #include "lwip/udp.h"
 #include "lwip/mld6.h"
 #include "lwip/timeouts.h"
+/* lwip esp includes */
 #include "lwip/esp_common.h"
 #include "lwip/ip6_esp.h"
-
+#include "lwip/ip4_esp.h"
 /* this example's includes */
 #include "echo.h"
 
@@ -164,7 +161,7 @@ main(size_t argc,
 
     sys_restart_timeouts();
 
-    #if 0
+    #if 1
     /* whether to include (script generated) provisioning code. */
     #include "ipsec_provision.c"
     #endif
