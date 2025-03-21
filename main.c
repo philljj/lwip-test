@@ -191,14 +191,20 @@ main(size_t argc,
                 continue;
         }
 
-    #if 1
+    #if 0
         /* Process all in one contiguous pbuf. */
         struct pbuf * pbuf = pbuf_alloc(PBUF_RAW, hdr->len, PBUF_RAM);
         memcpy(pbuf->payload, data, hdr->len);
         netif.input(pbuf, &netif);
     #else
-        /* Process in pbuf chain to test chaining. */
-        size_t chain_len = 120;
+        /**
+         * Process in pbuf chain to test chaining.
+         *
+         * Note: chain_len needs to be large enough to accomodate all
+         * headers in the first pbuf. See definition of ESP_MAX_HDRS_LEN
+         * in src/include/lwip/esp_common.h for more info.
+         * */
+        size_t chain_len = ESP_MAX_HDRS_LEN;
         size_t hdr_len = 0;
         size_t pbuf_len = 0;
         size_t offset = 0;
@@ -209,7 +215,7 @@ main(size_t argc,
         pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
         pbuf_head = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
 
-        #if 0
+        #if 1
         printf("chain_len: %d\n", chain_len);
         printf("pbuf_len: %d\n", pbuf_len);
         printf("hdr_len: %d\n", hdr_len);
@@ -224,7 +230,7 @@ main(size_t argc,
             pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
             pbuf_tail = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
 
-            #if 0
+            #if 1
             printf("chain_len: %d\n", chain_len);
             printf("pbuf_len: %d\n", pbuf_len);
             printf("hdr_len: %d\n", hdr_len);
