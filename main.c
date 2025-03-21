@@ -215,7 +215,7 @@ main(size_t argc,
         pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
         pbuf_head = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
 
-        #if 1
+        #if 0
         printf("chain_len: %d\n", chain_len);
         printf("pbuf_len: %d\n", pbuf_len);
         printf("hdr_len: %d\n", hdr_len);
@@ -230,7 +230,7 @@ main(size_t argc,
             pbuf_len = (chain_len <= hdr_len) ? chain_len : hdr_len;
             pbuf_tail = pbuf_alloc(PBUF_RAW, pbuf_len, PBUF_RAM);
 
-            #if 1
+            #if 0
             printf("chain_len: %d\n", chain_len);
             printf("pbuf_len: %d\n", pbuf_len);
             printf("hdr_len: %d\n", hdr_len);
